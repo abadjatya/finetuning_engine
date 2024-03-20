@@ -3,7 +3,7 @@ import os
 import torch
 from datasets import DatasetDict, load_dataset, load_from_disk, Dataset
 from datasets.builder import DatasetGenerationError
-from peft import LoraConfig
+from peft import LoraConfig,get_peft_model,prepare_model_for_kbit_training 
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
@@ -117,7 +117,7 @@ def create_and_prepare_model(args, data_args, training_args):
         model = prepare_model_for_kbit_training(
             model,
             use_gradient_checkpointing=training_args.gradient_checkpointing,
-            gradient_checkpointing_kwargs={"use_reentrant": model_args.use_reentrant},
+            gradient_checkpointing_kwargs={"use_reentrant": args.use_reentrant},
         )
 
     peft_config = None
@@ -182,7 +182,7 @@ def create_and_prepare_model(args, data_args, training_args):
 
 
 def create_datasets(tokenizer, data_args, training_args, apply_chat_template=False):
-    def formatting_func():
+    def formatting_func(example):
         EOS_TOKEN = tokenizer.eos_token
         return example + " " + EOS_TOKEN
 
@@ -239,16 +239,16 @@ def create_datasets(tokenizer, data_args, training_args, apply_chat_template=Fal
         train_df, test_df = train_test_split(df, test_size=0.1, random_state=42)
         
         if data_args.append_concat_token == True:
-            train_df["text"] = train_df[data_args.dataset_text_field].apply(formatting_func)
-            test_df["text"] = test_df[dataset_text_field].apply(formatting_func)
+            train_df[data_args.dataset_text_field] = train_df[data_args.dataset_text_field].apply(formatting_func)
+            test_df[data_args.dataset_text_field] = test_df[data_args.dataset_text_field].apply(formatting_func)
         
-        train_dataset = Dataset.from_pandas(train_df)
+        train_data = Dataset.from_pandas(train_df)
         if apply_chat_template:
             train_dataset = train_dataset.map(
                 preprocess,
                 batched=True
             )
-        test_dataset = Dataset.from_pandas(test_df)
+        valid_data = Dataset.from_pandas(test_df)
         if apply_chat_template:
             test_dataset = test_dataset.map(
                 preprocess,
