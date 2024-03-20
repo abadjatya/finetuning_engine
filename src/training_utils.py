@@ -103,7 +103,7 @@ def create_and_prepare_model(args, data_args, training_args):
             args.model_name_or_path,
             load_in_8bit=load_in_8bit,
             quantization_config=bnb_config,
-            device_map=device_map,
+            device_map=None,
             trust_remote_code=True,
             attn_implementation="flash_attention_2" if args.use_flash_attn else "eager",
             torch_dtype=quant_storage_stype or torch.float32,

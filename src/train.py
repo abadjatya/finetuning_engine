@@ -1,12 +1,12 @@
 import os
 import sys
-from typing import Optional
 from transformers import set_seed
 import torch
-from transformers import HfArgumentParser, TrainingArguments
+from transformers import HfArgumentParser, TrainingArguments, EarlyStoppingCallback
 from trl import SFTTrainer
 from training_utils import create_and_prepare_model, create_datasets
 from data_models import ModelArguments,DataTrainingArguments
+import wandb
 
 def main(model_args, data_args, training_args):
     # Set seed for reproducibility
@@ -50,6 +50,8 @@ def main(model_args, data_args, training_args):
         },
         dataset_text_field=data_args.dataset_text_field,
         max_seq_length=data_args.max_seq_length,
+        report_to="wandb",
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
     )
     trainer.accelerator.print(f"{trainer.model}")
     trainer.model.print_trainable_parameters()
