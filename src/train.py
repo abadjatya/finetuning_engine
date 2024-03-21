@@ -72,7 +72,7 @@ if __name__ == "__main__":
     parser = HfArgumentParser(
         (ModelArguments, DataTrainingArguments, TrainingArguments)
     )
-    
+
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
@@ -81,5 +81,5 @@ if __name__ == "__main__":
         )
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-    
+
     main(model_args, data_args, training_args)
