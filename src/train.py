@@ -50,7 +50,6 @@ def main(model_args, data_args, training_args):
         },
         dataset_text_field=data_args.dataset_text_field,
         max_seq_length=data_args.max_seq_length,
-        report_to="wandb",
         callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
     )
     trainer.accelerator.print(f"{trainer.model}")
