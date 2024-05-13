@@ -14,10 +14,24 @@ import pandas as pd
 import csv
 from sklearn.model_selection import train_test_split
 from datasets.builder import DatasetGenerationError
+import json
 
 DEFAULT_CHATML_CHAT_TEMPLATE = "{% for message in messages %}\n{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% if loop.last and add_generation_prompt %}{{'<|im_start|>assistant\n' }}{% endif %}{% endfor %}"
 DEFAULT_ZEPHYR_CHAT_TEMPLATE = "{% for message in messages %}\n{% if message['role'] == 'user' %}\n{{ '<|user|>\n' + message['content'] + eos_token }}\n{% elif message['role'] == 'system' %}\n{{ '<|system|>\n' + message['content'] + eos_token }}\n{% elif message['role'] == 'assistant' %}\n{{ '<|assistant|>\n'  + message['content'] + eos_token }}\n{% endif %}\n{% if loop.last and add_generation_prompt %}\n{{ '<|assistant|>' }}\n{% endif %}\n{% endfor %}"
-
+LLAMA_3_CHAT_TEMPLATE = (
+    "{% for message in messages %}"
+        "{% if message['role'] == 'system' %}"
+            "{{ message['content'] }}"
+        "{% elif message['role'] == 'user' %}"
+            "{{ '\n\nHuman: ' + message['content'] +  eos_token }}"
+        "{% elif message['role'] == 'assistant' %}"
+            "{{ '\n\nAssistant: '  + message['content'] +  eos_token  }}"
+        "{% endif %}"
+    "{% endfor %}"
+    "{% if add_generation_prompt %}"
+    "{{ '\n\nAssistant: ' }}"
+    "{% endif %}"
+)
 
 class ZephyrSpecialTokens(str, Enum):
     user = "<|user|>"
@@ -182,15 +196,15 @@ def create_and_prepare_model(args, data_args, training_args):
 
 
 def create_datasets(tokenizer, data_args, training_args, apply_chat_template=False):
+    tokenizer.chat_template = LLAMA_3_CHAT_TEMPLATE
+    tokenizer.pad_token = tokenizer.eos_token
+
     def formatting_func(example):
         EOS_TOKEN = tokenizer.eos_token
         return example + " " + EOS_TOKEN
 
     def preprocess(samples):
-        batch = []
-        for conversation in samples["messages"]:
-            batch.append(tokenizer.apply_chat_template(conversation, tokenize=False))
-        return {"content": batch}
+        return {"text":tokenizer.apply_chat_template(samples["messages"], tokenize=False)}
 
     if data_args.dataset_name == None and data_args.csv_path == None:
         raise ValueError("HF Dataset name or CSV path is required!")
@@ -201,32 +215,31 @@ def create_datasets(tokenizer, data_args, training_args, apply_chat_template=Fal
 
     if data_args.dataset_name != None:
         raw_datasets = DatasetDict()
-        for split in data_args.splits.split(","):
-            try:
+        try:
                 # Try first if dataset on a Hub repo
-                dataset = load_dataset(data_args.dataset_name, split=split)
-            except DatasetGenerationError:
+            dataset = load_dataset(data_args.dataset_name,split="train").train_test_split(test_size=0.1)
+            
+            train_data = dataset["train"]
+            valid_data = dataset["test"] 
+                
+        except DatasetGenerationError:
                 # If not, check local dataset
-                dataset = load_from_disk(os.path.join(data_args.dataset_name, split))
-
-            if "train" in split:
-                raw_datasets["train"] = dataset
-            elif "test" in split:
-                raw_datasets["test"] = dataset
-            else:
-                raise ValueError(
-                    f"Split type {split} not recognized as one of test or train."
-                )
+            dataset = load_from_disk(os.path.join(data_args.dataset_name, split))
 
         if apply_chat_template:
-            raw_datasets = raw_datasets.map(
+            train_data = train_data.map(
                 preprocess,
                 batched=True,
-                remove_columns=raw_datasets["train"].column_names,
+                remove_columns=["messages"],
             )
 
-        train_data = raw_datasets["train"]
-        valid_data = raw_datasets["test"]
+            valid_data = valid_data.map(
+                preprocess,
+                batched=True,
+                remove_columns=["messages"]
+            )
+
+    
         print(
             f"Size of the train set: {len(train_data)}. Size of the validation set: {len(valid_data)}"
         )
@@ -244,15 +257,17 @@ def create_datasets(tokenizer, data_args, training_args, apply_chat_template=Fal
         
         train_data = Dataset.from_pandas(train_df)
         if apply_chat_template:
-            train_dataset = train_dataset.map(
+            train_data = train_data.map(
                 preprocess,
-                batched=True
+                remove_columns=["messages"],
             )
         valid_data = Dataset.from_pandas(test_df)
         if apply_chat_template:
-            test_dataset = test_dataset.map(
+            valid_data = valid_data.map(
                 preprocess,
-                batched=True
+                remove_columns=["messages"],
             )
-
+        print(train_data.head())
         return train_data,valid_data
+
+

@@ -85,13 +85,13 @@ class ModelArguments:
 @dataclass
 class DataTrainingArguments:
     dataset_name: Optional[str] = field(
-        default="timdettmers/openassistant-guanaco",
+        default=None,
         metadata={"help": "The preference dataset to use."},
     )
-    # @TODO use either dataset name or csv_path
+    
     csv_path: Optional[str] = field(
-    	default=None,
-    	metadata={"help": "Data path for csv loading"}
+        default=None,
+        metadata={"help": "Data path for csv loading"}
     )
 
     packing: Optional[bool] = field(
@@ -104,7 +104,7 @@ class DataTrainingArguments:
     )
 
     max_seq_length: Optional[int] = field(default=512)
-    
+
     append_concat_token: Optional[bool] = field(
         default=False,
         metadata={

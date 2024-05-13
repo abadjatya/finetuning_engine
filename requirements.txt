@@ -1,12 +1,10 @@
 datasets
-pandas==2.2.1
+pandas
 peft
-scikit_learn==1.4.1.post1
-torch==2.1.0
+scikit_learn
+torch
 transformers
 trl
-unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git
 accelerate
 bitsandbytes
 deepspeed
-flash-attn
