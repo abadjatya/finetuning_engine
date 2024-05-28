@@ -196,7 +196,6 @@ def create_and_prepare_model(args, data_args, training_args):
 
 
 def create_datasets(tokenizer, data_args, training_args, apply_chat_template=False):
-    tokenizer.chat_template = LLAMA_3_CHAT_TEMPLATE
     tokenizer.pad_token = tokenizer.eos_token
 
     def formatting_func(example):

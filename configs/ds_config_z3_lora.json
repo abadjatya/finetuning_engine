@@ -3,13 +3,12 @@
         "enabled": true
     },
     "zero_optimization": {
-        "stage": 3,
+        "stage": 2,
         "overlap_comm": true,
         "contiguous_gradients": true,
         "zero_quantized_nontrainable_weights": true,
         "reduce_bucket_size": 10000000,
-        "reduce_scatter": true,
-        "stage3_gather_16bit_weights_on_model_save": "auto"
+        "reduce_scatter": true
     },
     "gradient_accumulation_steps": "auto",
     "gradient_clipping": "auto",
