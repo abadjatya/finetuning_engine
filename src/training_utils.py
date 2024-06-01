@@ -187,7 +187,7 @@ def create_and_prepare_model(args, data_args, training_args):
         model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
     else:
         tokenizer = AutoTokenizer.from_pretrained(
-            args.model_name_or_path, trust_remote_code=True
+            args.model_name_or_path, trust_remote_code=True, padding_side="right"
         )
         tokenizer.pad_token = tokenizer.eos_token
 
