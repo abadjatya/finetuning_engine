@@ -215,22 +215,11 @@ def create_datasets(tokenizer, data_args, training_args, apply_chat_template=Fal
         raw_datasets = DatasetDict()
         try:
                 # Try first if dataset on a Hub repo
-            dataset = load_dataset(data_args.dataset_name,split="train").train_test_split(test_size=0.1)
+            dataset = load_dataset(data_args.dataset_name,split="train").train_test_split(test_size=0.2)
             
             train_data = dataset["train"]
-            train_data = train_data.remove_columns(["__index_level_0__"])
-            train_data_pd = train_data.to_pandas()
-            train_data_pd.dropna(inplace=True)
-            train_data = Dataset.from_pandas(train_data_pd)
-            train_data = train_data.remove_columns(["__index_level_0__"])
             valid_data = dataset["test"]
-            valid_data = valid_data.remove_columns(["__index_level_0__"])
-            valid_data_pd = valid_data.to_pandas()
-            valid_data_pd.dropna(inplace=True)
-            valid_data = Dataset.from_pandas(valid_data_pd)
-            valid_data = valid_data.remove_columns(["__index_level_0__"])
-
-                
+            
         except DatasetGenerationError:
                 # If not, check local dataset
             dataset = load_from_disk(os.path.join(data_args.dataset_name, split))
