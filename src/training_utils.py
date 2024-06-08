@@ -190,6 +190,7 @@ def create_and_prepare_model(args, data_args, training_args):
             args.model_name_or_path, trust_remote_code=True, padding_side="right"
         )
         tokenizer.pad_token = tokenizer.eos_token
+        model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
 
 
     return model, peft_config, tokenizer 
