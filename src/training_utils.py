@@ -117,7 +117,7 @@ def create_and_prepare_model(args, data_args, training_args):
             args.model_name_or_path,
             load_in_8bit=load_in_8bit,
             quantization_config=bnb_config,
-            device_map="auto",
+            device_map=int(os.environ.get("LOCAL_RANK", -1)),
             trust_remote_code=True,
             attn_implementation="flash_attention_2" if args.use_flash_attn else "eager",
             torch_dtype=torch.bfloat16,
@@ -203,7 +203,6 @@ def create_and_prepare_model(args, data_args, training_args):
             args.model_name_or_path, trust_remote_code=True, padding_side="right"
         )
         tokenizer.pad_token = tokenizer.eos_token
-        model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
 
 
     return model, peft_config, tokenizer 
@@ -228,7 +227,7 @@ def create_datasets(tokenizer, data_args, training_args, apply_chat_template=Fal
         raw_datasets = DatasetDict()
         try:
                 # Try first if dataset on a Hub repo
-            dataset = load_dataset(data_args.dataset_name,split="train").train_test_split(test_size=0.2)
+            dataset = load_dataset(data_args.dataset_name,split="train").train_test_split(test_size=0.15)
             
             train_data = dataset["train"]
             valid_data = dataset["test"]
