@@ -7,9 +7,13 @@ from trl import SFTTrainer
 from training_utils import create_and_prepare_model, create_datasets
 from data_models import ModelArguments,DataTrainingArguments
 import wandb
+import gc
 
 def main(model_args, data_args, training_args):
     # Set seed for reproducibility
+    gc.collect()
+    torch.cuda.empty_cache()
+    torch.set_grad_enabled(True)    
     set_seed(training_args.seed)
 
     # model

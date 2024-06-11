@@ -120,7 +120,7 @@ def create_and_prepare_model(args, data_args, training_args):
             device_map="auto",
             trust_remote_code=True,
             attn_implementation="flash_attention_2" if args.use_flash_attn else "eager",
-            torch_dtype=quant_storage_stype or torch.bfloat16,
+            torch_dtype=torch.bfloat16,
         )
 
     if (
@@ -133,6 +133,19 @@ def create_and_prepare_model(args, data_args, training_args):
             use_gradient_checkpointing=training_args.gradient_checkpointing,
             gradient_checkpointing_kwargs={"use_reentrant": args.use_reentrant},
         )
+
+
+    for param in model.parameters():
+        # freeze base model's layers
+        param.requires_grad = False
+
+    if hasattr(model, "enable_input_require_grads"):
+        model.enable_input_require_grads()
+    else:
+        def make_inputs_require_grad(module, input, output):
+            output.requires_grad_(True)
+
+        model.get_input_embeddings().register_forward_hook(make_inputs_require_grad)
 
     peft_config = None
     if args.use_peft_lora and not args.use_unsloth:
