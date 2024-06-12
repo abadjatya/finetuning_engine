@@ -13,14 +13,13 @@ def main(model_args, data_args, training_args):
     # Set seed for reproducibility
     gc.collect()
     torch.cuda.empty_cache()
-    torch.set_grad_enabled(True)    
     set_seed(training_args.seed)
 
     # model
     model, peft_config, tokenizer = create_and_prepare_model(
         model_args, data_args, training_args
     )
-
+    model.to('cuda')
     # gradient ckpt
     model.config.use_cache = not training_args.gradient_checkpointing
     training_args.gradient_checkpointing = (
@@ -54,7 +53,7 @@ def main(model_args, data_args, training_args):
         },
         dataset_text_field=data_args.dataset_text_field,
         max_seq_length=data_args.max_seq_length,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)]
     )
     trainer.accelerator.print(f"{trainer.model}")
     trainer.model.print_trainable_parameters()
