@@ -97,12 +97,7 @@ def create_and_prepare_model(args, data_args, training_args):
     ):
         raise NotImplementedError("Unsloth is not supported in distributed training")
 
-    if args.use_4bit_quantization or args.use_8bit_quantization:
-        device_map = (
-            int(os.environ.get("LOCAL_RANK", -1))
-            if torch.distributed.is_available() and torch.distributed.is_initialized()
-            else "auto"
-        )  # {"": 0}
+    device_map = (int(os.environ.get("LOCAL_RANK", -1)) if torch.distributed.is_available() and torch.distributed.is_initialized() else "auto")
 
     if args.use_unsloth:
         # Load model
@@ -113,6 +108,8 @@ def create_and_prepare_model(args, data_args, training_args):
             load_in_4bit=load_in_4bit,
         )
     else:
+        print("MAIN YAHA HOON")
+        device_map = None
         model = AutoModelForCausalLM.from_pretrained(
             args.model_name_or_path,
             load_in_8bit=load_in_8bit,
@@ -134,11 +131,6 @@ def create_and_prepare_model(args, data_args, training_args):
             gradient_checkpointing_kwargs={"use_reentrant": args.use_reentrant},
         )
 
-
-    for param in model.parameters():
-        # freeze base model's layers
-        param.requires_grad = False
-
     if hasattr(model, "enable_input_require_grads"):
         model.enable_input_require_grads()
     else:
@@ -147,8 +139,11 @@ def create_and_prepare_model(args, data_args, training_args):
 
         model.get_input_embeddings().register_forward_hook(make_inputs_require_grad)
 
+
+
     peft_config = None
     if args.use_peft_lora and not args.use_unsloth:
+        print("MAIN YAHA BHI HOON")
         peft_config = LoraConfig(
             lora_alpha=args.lora_alpha,
             lora_dropout=args.lora_dropout,
