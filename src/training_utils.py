@@ -209,7 +209,11 @@ def create_datasets(tokenizer, data_args, training_args, apply_chat_template=Fal
         return example + " " + EOS_TOKEN
 
     def preprocess(samples):
-        return {"text":tokenizer.apply_chat_template(samples["messages"], tokenize=False)}
+        try:
+
+            return {"message":tokenizer.apply_chat_template(json.loads(samples["text"]), tokenize=False)}
+        except Exception as e:
+            return {"message":None}
 
     if data_args.dataset_name == None and data_args.csv_path == None:
         raise ValueError("HF Dataset name or CSV path is required!")
@@ -222,11 +226,10 @@ def create_datasets(tokenizer, data_args, training_args, apply_chat_template=Fal
         raw_datasets = DatasetDict()
         try:
                 # Try first if dataset on a Hub repo
-            dataset = load_dataset(data_args.dataset_name,split="train").train_test_split(test_size=0.15)
+            dataset = load_dataset(data_args.dataset_name,split="train").train_test_split(test_size=0.1)
             
             train_data = dataset["train"]
             valid_data = dataset["test"]
-            
         except DatasetGenerationError:
                 # If not, check local dataset
             dataset = load_from_disk(os.path.join(data_args.dataset_name, split))
@@ -235,17 +238,26 @@ def create_datasets(tokenizer, data_args, training_args, apply_chat_template=Fal
             print("I AM HERE AHOLE")
             train_data = train_data.map(
                 preprocess,
-                batched=True,
-                remove_columns=["messages"],
+                batched=False,
+                remove_columns=["text"],
             )
-
+           
+            train_data = train_data.to_pandas()
+            train_data.dropna(inplace=True)
+            train_data = Dataset.from_pandas(train_data)
+            print(train_data)
+            
             valid_data = valid_data.map(
                 preprocess,
-                batched=True,
-                remove_columns=["messages"]
+                batched=False,
+                remove_columns=["text"]
             )
 
-    
+            valid_data = valid_data.to_pandas()
+            valid_data.dropna(inplace=True)
+            valid_data = Dataset.from_pandas(valid_data)
+            print(valid_data)
+
         print(
             f"Size of the train set: {len(train_data)}. Size of the validation set: {len(valid_data)}"
         )

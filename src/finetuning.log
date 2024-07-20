@@ -1,0 +1,165 @@
+[2024-07-20 09:28:40,344] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2024-07-20 09:28:45,221] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2024-07-20 09:28:45,249] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.3
+[93m [WARNING] [0m using untested triton version (2.3.0), only 1.0.0 is known to be compatible
+[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.3
+[93m [WARNING] [0m using untested triton version (2.3.0), only 1.0.0 is known to be compatible
+[2024-07-20 09:28:46,125] [INFO] [comm.py:637:init_distributed] cdb=None
+[2024-07-20 09:28:46,138] [INFO] [comm.py:637:init_distributed] cdb=None
+[2024-07-20 09:28:46,138] [INFO] [comm.py:668:init_distributed] Initializing TorchBackend in DeepSpeed with backend nccl
+MAIN YAHA HOON
+MAIN YAHA HOON
+[2024-07-20 09:28:53,883] [INFO] [partition_parameters.py:345:__exit__] finished initializing model - num_params = 363, num_elems = 13.02B
+MAIN YAHA BHI HOON
+MAIN YAHA BHI HOON
+I AM HERE AHOLE
+I AM HERE AHOLE
+Dataset({
+    features: ['message'],
+    num_rows: 2242
+})
+Dataset({
+    features: ['message'],
+    num_rows: 250
+})
+Size of the train set: 2242. Size of the validation set: 250
+A sample of train dataset: {'message': '<s>[INST] <<SYS>>\n\n\tYou are an expert in SQL. You will be provided with a SQL query and metadata related to the query by the user. Metadata will involve table id, the columns in the table and their ids respectively. You will also be provided with relevant examples for the task of transforming the given sql to glaze query language (mbql). Using the input data and examples , You have to transform the given sql query to glaze query language.\n\t\n<</SYS>>\n\n\n\t\tSQL_QUERY: SELECT T2.id FROM region_sales AS T1 INNER JOIN game_platform AS T2 ON T1.game_platform_id = T2.id WHERE T1.region_id = 3 \n\n\n\t\tMetadata for the query : Table: region_sales(130)\nColumns: region_id(1008), num_sales(1007), my_row_id(1005), game_platform_id(1006), \nTable: game_platform(131)\nColumns: game_publisher_id(1009), id(1012), platform_id(1011), release_year(1010), \n \n\n\n\t\tExamples : nan \n\n\n\t\tglaze query language response: [/INST] nan </s>'}
+Dataset({
+    features: ['message'],
+    num_rows: 2242
+})
+Dataset({
+    features: ['message'],
+    num_rows: 250
+})
+Size of the train set: 2242. Size of the validation set: 250
+A sample of train dataset: {'message': '<s>[INST] <<SYS>>\n\n\tYou are an expert in SQL. You will be provided with a SQL query and metadata related to the query by the user. Metadata will involve table id, the columns in the table and their ids respectively. You will also be provided with relevant examples for the task of transforming the given sql to glaze query language (mbql). Using the input data and examples , You have to transform the given sql query to glaze query language.\n\t\n<</SYS>>\n\n\n\t\tSQL_QUERY: SELECT T2.id FROM region_sales AS T1 INNER JOIN game_platform AS T2 ON T1.game_platform_id = T2.id WHERE T1.region_id = 3 \n\n\n\t\tMetadata for the query : Table: region_sales(130)\nColumns: region_id(1008), num_sales(1007), my_row_id(1005), game_platform_id(1006), \nTable: game_platform(131)\nColumns: game_publisher_id(1009), id(1012), platform_id(1011), release_year(1010), \n \n\n\n\t\tExamples : nan \n\n\n\t\tglaze query language response: [/INST] nan </s>'}
+PeftModelForCausalLM(
+  (base_model): LoraModel(
+    (model): LlamaForCausalLM(
+      (model): LlamaModel(
+        (embed_tokens): Embedding(32016, 5120)
+        (layers): ModuleList(
+          (0-39): 40 x LlamaDecoderLayer(
+            (self_attn): LlamaFlashAttention2(
+              (q_proj): lora.Linear(
+                (base_layer): Linear(in_features=5120, out_features=5120, bias=False)
+                (lora_dropout): ModuleDict(
+                  (default): Dropout(p=0.1, inplace=False)
+                )
+                (lora_A): ModuleDict(
+                  (default): Linear(in_features=5120, out_features=32, bias=False)
+                )
+                (lora_B): ModuleDict(
+                  (default): Linear(in_features=32, out_features=5120, bias=False)
+                )
+                (lora_embedding_A): ParameterDict()
+                (lora_embedding_B): ParameterDict()
+              )
+              (k_proj): lora.Linear(
+                (base_layer): Linear(in_features=5120, out_features=5120, bias=False)
+                (lora_dropout): ModuleDict(
+                  (default): Dropout(p=0.1, inplace=False)
+                )
+                (lora_A): ModuleDict(
+                  (default): Linear(in_features=5120, out_features=32, bias=False)
+                )
+                (lora_B): ModuleDict(
+                  (default): Linear(in_features=32, out_features=5120, bias=False)
+                )
+                (lora_embedding_A): ParameterDict()
+                (lora_embedding_B): ParameterDict()
+              )
+              (v_proj): lora.Linear(
+                (base_layer): Linear(in_features=5120, out_features=5120, bias=False)
+                (lora_dropout): ModuleDict(
+                  (default): Dropout(p=0.1, inplace=False)
+                )
+                (lora_A): ModuleDict(
+                  (default): Linear(in_features=5120, out_features=32, bias=False)
+                )
+                (lora_B): ModuleDict(
+                  (default): Linear(in_features=32, out_features=5120, bias=False)
+                )
+                (lora_embedding_A): ParameterDict()
+                (lora_embedding_B): ParameterDict()
+              )
+              (o_proj): lora.Linear(
+                (base_layer): Linear(in_features=5120, out_features=5120, bias=False)
+                (lora_dropout): ModuleDict(
+                  (default): Dropout(p=0.1, inplace=False)
+                )
+                (lora_A): ModuleDict(
+                  (default): Linear(in_features=5120, out_features=32, bias=False)
+                )
+                (lora_B): ModuleDict(
+                  (default): Linear(in_features=32, out_features=5120, bias=False)
+                )
+                (lora_embedding_A): ParameterDict()
+                (lora_embedding_B): ParameterDict()
+              )
+              (rotary_emb): LlamaRotaryEmbedding()
+            )
+            (mlp): LlamaMLP(
+              (gate_proj): lora.Linear(
+                (base_layer): Linear(in_features=5120, out_features=13824, bias=False)
+                (lora_dropout): ModuleDict(
+                  (default): Dropout(p=0.1, inplace=False)
+                )
+                (lora_A): ModuleDict(
+                  (default): Linear(in_features=5120, out_features=32, bias=False)
+                )
+                (lora_B): ModuleDict(
+                  (default): Linear(in_features=32, out_features=13824, bias=False)
+                )
+                (lora_embedding_A): ParameterDict()
+                (lora_embedding_B): ParameterDict()
+              )
+              (up_proj): lora.Linear(
+                (base_layer): Linear(in_features=5120, out_features=13824, bias=False)
+                (lora_dropout): ModuleDict(
+                  (default): Dropout(p=0.1, inplace=False)
+                )
+                (lora_A): ModuleDict(
+                  (default): Linear(in_features=5120, out_features=32, bias=False)
+                )
+                (lora_B): ModuleDict(
+                  (default): Linear(in_features=32, out_features=13824, bias=False)
+                )
+                (lora_embedding_A): ParameterDict()
+                (lora_embedding_B): ParameterDict()
+              )
+              (down_proj): lora.Linear(
+                (base_layer): Linear(in_features=13824, out_features=5120, bias=False)
+                (lora_dropout): ModuleDict(
+                  (default): Dropout(p=0.1, inplace=False)
+                )
+                (lora_A): ModuleDict(
+                  (default): Linear(in_features=13824, out_features=32, bias=False)
+                )
+                (lora_B): ModuleDict(
+                  (default): Linear(in_features=32, out_features=5120, bias=False)
+                )
+                (lora_embedding_A): ParameterDict()
+                (lora_embedding_B): ParameterDict()
+              )
+              (act_fn): SiLU()
+            )
+            (input_layernorm): LlamaRMSNorm()
+            (post_attention_layernorm): LlamaRMSNorm()
+          )
+        )
+        (norm): LlamaRMSNorm()
+      )
+      (lm_head): Linear(in_features=5120, out_features=32016, bias=False)
+    )
+  )
+)
+trainable params: 125,173,760 || all params: 13,141,201,920 || trainable%: 0.9525290058095386
+trainable params: 125,173,760 || all params: 13,141,201,920 || trainable%: 0.9525290058095386
+[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.3
+[93m [WARNING] [0m using untested triton version (2.3.0), only 1.0.0 is known to be compatible
